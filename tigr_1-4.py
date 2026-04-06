@@ -75,39 +75,103 @@ elif st.session_state.current_step == 3:
             st.rerun()
 
 # ==================== ЗАДАНИЕ 2 ====================
+def render_task2(time_list, event_list, key_prefix):
+    """Отображает задание на сопоставление"""
+    
+    # Стилизация
+    st.markdown(
+        """
+        <style>
+            .task2-container {
+                display: flex;
+                gap: 40px;
+                margin: 20px 0;
+            }
+            .task2-time, .task2-event {
+                flex: 1;
+                border: 2px solid orange;
+                background-color: #ffebcc;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            .task2-time h4, .task2-event h4 {
+                text-align: center;
+                margin: 0 0 15px 0;
+            }
+            .task2-item {
+                padding: 10px;
+                margin: 10px 0;
+                background-color: white;
+                border-radius: 5px;
+                border-left: 4px solid orange;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    # Два столбца
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown('<div class="task2-time"><h4>📅 Время</h4>', unsafe_allow_html=True)
+        for i, t in enumerate(time_list):
+            st.markdown(f'<div class="task2-item">{i+1}. {t}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
+        for i, e in enumerate(event_list):
+            st.markdown(f'<div class="task2-item">{chr(65+i)}. {e}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Выпадающие списки
+    matching = {}
+    for i, time_text in enumerate(time_list):
+        options = [f"{chr(65+j)}. {event_list[j]}" for j in range(len(event_list))]
+        matching[i] = st.selectbox(
+            f"Для «{time_text}» выберите событие:",
+            options=options,
+            key=f"{key_prefix}_match_{i}",
+            index=None
+        )
+    
+    return matching
+
+
 if st.session_state.current_step == 4:
     st.header("Задание 2")
     st.markdown(
         """
         <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
         <div class="custom-text">
-            <p>Вы увидите 3 временных маркера.</p>
-            <p>Ниже будут представлены 3 предложения.</p>
-            <p>Вам необходимо соединить маркеры времени с частями предложений.</p>
+            <p>Вы увидите 3 маркера времени и 3 предложения.</p>
+            <p>Для каждого времени выберите соответствующее предложение из выпадающего списка.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    if st.button("Начать тренировку задания 2"):
+    if st.button("Начать тренировку"):
         st.session_state.current_step = 5
         st.session_state.task2_test_index = 0
         st.rerun()
 
 elif st.session_state.current_step == 5:
     index = st.session_state.task2_test_index
-
+    
     if index < len(task_data.person_middle_minus_test):
         st.header("Тренировка задания 2")
-        answer = func.render_middle_plus_task(
-            st,
-            {"stimulus_text": task_data.person_middle_minus_test[index],
-             "answers": task_data.person_middle_minus_opt_test[index]},
-            index,
-            "train2"
-        )
-        if answer is not None:
-            st.session_state.task2_test_index += 1
-            st.rerun()
+        task = task_data.person_middle_minus_test[index]
+        matching = render_task2(task["time"], task["event"], f"train2_{index}")
+        
+        if st.button("Далее"):
+            if all(v is not None for v in matching.values()):
+                st.session_state.task2_test_index += 1
+                st.rerun()
+            else:
+                st.warning("Выберите все варианты")
     else:
         st.header("Тренировка задания 2 завершена!")
         if st.button("Перейти к заданию 2"):
@@ -117,18 +181,20 @@ elif st.session_state.current_step == 5:
 elif st.session_state.current_step == 6:
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
     answ_co = len(task_data.person_middle_minus)
-
+    
     if index < answ_co:
         st.header("Задание 2")
-        task = {
-            "stimulus_text": task_data.person_middle_minus[index],
-            "answers": task_data.person_middle_minus_opt[index]
-        }
-        answer = func.render_middle_plus_task(st, task, index, "Задание2")
-        if answer is not None:
-            st.session_state.responses[f"Задание 2: {task_data.person_middle_minus[index]}"] = answer
-            st.rerun()
-
+        task = task_data.person_middle_minus[index]
+        matching = render_task2(task["time"], task["event"], f"task2_{index}")
+        
+        if st.button("Далее"):
+            if all(v is not None for v in matching.values()):
+                for i, time_text in enumerate(task["time"]):
+                    st.session_state.responses[f"Задание 2: {time_text}"] = matching[i]
+                st.rerun()
+            else:
+                st.warning("Выберите все варианты")
+        
         func.skip_task(st, index, answ_co, "Задание 2: ")
     else:
         st.header("Задание 2 завершено!")
