@@ -78,6 +78,7 @@ elif st.session_state.current_step == 3:
 def render_task2(time_list, event_list, key_prefix):
     """Отображает задание на сопоставление с случайным порядком событий"""
     
+    # Стилизация
     st.markdown(
         """
         <style>
@@ -109,6 +110,7 @@ def render_task2(time_list, event_list, key_prefix):
         unsafe_allow_html=True,
     )
     
+    # Два столбца
     col1, col2 = st.columns(2)
     
     with col1:
@@ -134,6 +136,7 @@ def render_task2(time_list, event_list, key_prefix):
     
     st.markdown("---")
     
+    # Выпадающие списки
     matching = {}
     for i, time_text in enumerate(time_list):
         display_options = [f"{chr(65+j)}. {event_text}" for j, (_, event_text) in enumerate(shuffled_events)]
@@ -152,6 +155,130 @@ def render_task2(time_list, event_list, key_prefix):
             matching[i] = None
     
     return matching
+
+
+# ИНСТРУКЦИЯ К ЗАДАНИЮ 2 (страница 4)
+if st.session_state.current_step == 4:
+    st.header("Задание 2")
+    
+    # ТЕКСТ ЗАДАНИЯ (инструкция)
+    st.markdown(
+        """
+        <style>
+            .custom-text {
+                font-size: 18px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+        </style>
+        <div class="custom-text">
+            <p>Вам необходимо соединить указатели времени (слева) с правильными событиями (справа).</p>
+            <p>Для каждого указателя времени выберите подходящее событие из выпадающего списка.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    if st.button("Начать тренировку"):
+        st.session_state.current_step = 5
+        st.session_state.task2_test_index = 0
+        st.rerun()
+
+# ТРЕНИРОВКА ЗАДАНИЯ 2 (страница 5)
+elif st.session_state.current_step == 5:
+    index = st.session_state.task2_test_index
+    
+    if index < len(task_data.person_middle_minus_test):
+        st.header("Тренировка задания 2")
+        
+        # ТЕКСТ ЗАДАНИЯ ДЛЯ ТРЕНИРОВКИ
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините время и событие.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        task = task_data.person_middle_minus_test[index]
+        matching = render_task2(task["time"], task["event"], f"train2_{index}")
+        
+        if st.button("Далее"):
+            if all(v is not None for v in matching.values()):
+                st.session_state.task2_test_index += 1
+                st.rerun()
+            else:
+                st.warning("Выберите все варианты")
+    else:
+        st.header("Тренировка задания 2 завершена!")
+        if st.button("Перейти к заданию 2"):
+            st.session_state.current_step = 6
+            st.rerun()
+
+# ОСНОВНОЕ ЗАДАНИЕ 2 (страница 6)
+elif st.session_state.current_step == 6:
+    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
+    answ_co = len(task_data.person_middle_minus)
+    
+    if index < answ_co:
+        st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
+        
+        # ТЕКСТ ЗАДАНИЯ ДЛЯ ОСНОВНОЙ ЧАСТИ
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините указатели времени с правильными событиями.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        task = task_data.person_middle_minus[index]
+        matching = render_task2(task["time"], task["event"], f"task2_{index}")
+        
+        if st.button("Сохранить ответ"):
+            if all(v is not None for v in matching.values()):
+                for i, time_text in enumerate(task["time"]):
+                    # Сохраняем текст события
+                    selected_event_text = task["event"][matching[i]]
+                    st.session_state.responses[f"Задание 2 (вопрос {index + 1}): {time_text}"] = selected_event_text
+                st.rerun()
+            else:
+                st.warning("Выберите все варианты")
+        
+        # Кнопка пропуска
+        st.markdown(
+            """
+            <style>
+                .st-key-skip .stButton button {
+                    background-color: transparent;
+                    border: 2px solid red;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    color: red;
+                    cursor: pointer;
+                    font-size: 14px;
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 1000;
+                }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        if st.button("Пропустить задание", key="skip"):
+            for i in range(index + 1, answ_co + 1):
+                st.session_state.responses[f"Задание 2: вопрос{i}"] = 0
+            st.rerun()
+    
+    else:
+        st.header("Задание 2 завершено!")
+        if st.button("Перейти к следующему заданию"):
+            st.session_state.current_step = 7
+            st.rerun()
 # ==================== ЗАДАНИЕ 3 ====================
 if st.session_state.current_step == 7:
     st.header("Задание 3")
