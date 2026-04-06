@@ -58,20 +58,26 @@ def save_result(st):
 
 # ==================== ФУНКЦИИ ДЛЯ РЕНДЕРИНГА ЗАДАНИЙ ====================
 
+import random
+
 def render_easy_task(st, task, task_index, task_name):
     """
     Отображение задания типа person_easy
     Формат: {'prime_text': str, 'stimulus_text': str, 'answers': tuple, 'hint': str}
     """
+    # Перемешиваем ответы
+    answers_list = list(task['answers'])
+    random.shuffle(answers_list)
+    
     st.write(f"**{task['prime_text']}**")
     st.write(task['stimulus_text'])
-
+    
     if 'hint' in task and task['hint']:
         st.caption(f"💡 Подсказка: {task['hint']}")
-
+    
     return st.radio(
         "Выберите правильный вариант:",
-        options=task['answers'],
+        options=answers_list,
         key=f"{task_name}_{task_index}",
         index=None
     )
