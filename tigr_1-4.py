@@ -226,7 +226,7 @@ elif st.session_state.current_step == 6:
         task = task_data.person_middle_minus[index]
         matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Сохранить ответ"):
+        if st.button("Далее"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
@@ -236,26 +236,6 @@ elif st.session_state.current_step == 6:
                 st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
         
         # Кнопка пропуска
-        st.markdown(
-            """
-            <style>
-                .st-key-skip .stButton button {
-                    background-color: transparent;
-                    border: 2px solid red;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    color: red;
-                    cursor: pointer;
-                    font-size: 14px;
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    z-index: 1000;
-                }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
         
         if st.button("Пропустить задание", key="skip"):
             for i in range(index + 1, answ_co + 1):
