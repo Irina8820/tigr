@@ -82,11 +82,6 @@ def render_task2(time_list, event_list, key_prefix):
     st.markdown(
         """
         <style>
-            .task2-container {
-                display: flex;
-                gap: 40px;
-                margin: 20px 0;
-            }
             .task2-time, .task2-event {
                 flex: 1;
                 border: 2px solid orange;
@@ -96,7 +91,6 @@ def render_task2(time_list, event_list, key_prefix):
             }
             .task2-time h4, .task2-event h4 {
                 text-align: center;
-                margin: 0 0 15px 0;
             }
             .task2-item {
                 padding: 10px;
@@ -110,58 +104,54 @@ def render_task2(time_list, event_list, key_prefix):
         unsafe_allow_html=True,
     )
     
+    # Перемешиваем события
+    shuffled_events = event_list.copy()
+    random.shuffle(shuffled_events)
+    
     # Два столбца
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown('<div class="task2-time"><h4>📅 Время</h4>', unsafe_allow_html=True)
+        st.markdown("### 📅 Время")
         for i, t in enumerate(time_list):
             st.markdown(f'<div class="task2-item">{i+1}. {t}</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
-        st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
-        
-        # Перемешиваем события
-        shuffled_events = list(enumerate(event_list))
-        random.shuffle(shuffled_events)
-        
-        letter_to_index = {}
-        for display_idx, (orig_idx, event_text) in enumerate(shuffled_events):
-            letter = chr(65 + display_idx)
-            letter_to_index[letter] = orig_idx
-            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("### 📖 Событие")
+        for i, event in enumerate(shuffled_events):
+            st.markdown(f'<div class="task2-item">{chr(65+i)}. {event}</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
     # Выпадающие списки
     matching = {}
     for i, time_text in enumerate(time_list):
-        display_options = [f"{chr(65+j)}. {event_text}" for j, (_, event_text) in enumerate(shuffled_events)]
+        options = [f"{chr(65+j)}. {shuffled_events[j]}" for j in range(len(shuffled_events))]
         
         selected = st.selectbox(
             f"Для «{time_text}» выберите событие:",
-            options=display_options,
+            options=options,
             key=f"{key_prefix}_match_{i}",
             index=None
         )
         
         if selected:
             selected_letter = selected[0]
-            matching[i] = letter_to_index[selected_letter]
+            selected_index = ord(selected_letter) - 65
+            selected_event = shuffled_events[selected_index]
+            original_index = event_list.index(selected_event)
+            matching[i] = original_index
         else:
             matching[i] = None
     
     return matching
 
 
-# ИНСТРУКЦИЯ К ЗАДАНИЮ 2 (страница 4)
+# СТРАНИЦА 4: ИНСТРУКЦИЯ К ЗАДАНИЮ 2
 if st.session_state.current_step == 4:
     st.header("Задание 2")
     
-    # ТЕКСТ ЗАДАНИЯ (инструкция)
+    # ОПИСАНИЕ ЗАДАНИЯ (как в задании 1)
     st.markdown(
         """
         <style>
@@ -172,8 +162,9 @@ if st.session_state.current_step == 4:
             }
         </style>
         <div class="custom-text">
-            <p>Вам необходимо соединить указатели времени (слева) с правильными событиями (справа).</p>
-            <p>Для каждого указателя времени выберите подходящее событие из выпадающего списка.</p>
+            <p>Вы увидите три указателя времени (слева) и три события (справа).</p>
+            <p>Вам необходимо соединить каждый указатель времени с соответствующим событием.</p>
+            <p>Для каждого времени выберите подходящее событие из выпадающего списка.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -184,14 +175,15 @@ if st.session_state.current_step == 4:
         st.session_state.task2_test_index = 0
         st.rerun()
 
-# ТРЕНИРОВКА ЗАДАНИЯ 2 (страница 5)
+
+# СТРАНИЦА 5: ТРЕНИРОВКА ЗАДАНИЯ 2
 elif st.session_state.current_step == 5:
     index = st.session_state.task2_test_index
     
     if index < len(task_data.person_middle_minus_test):
         st.header("Тренировка задания 2")
         
-        # ТЕКСТ ЗАДАНИЯ ДЛЯ ТРЕНИРОВКИ
+        # КРАТКОЕ ОПИСАНИЕ ДЛЯ ТРЕНИРОВКИ
         st.markdown(
             """
             <div class="custom-text">
@@ -204,19 +196,22 @@ elif st.session_state.current_step == 5:
         task = task_data.person_middle_minus_test[index]
         matching = render_task2(task["time"], task["event"], f"train2_{index}")
         
-        if st.button("Далее"):
-            if all(v is not None for v in matching.values()):
-                st.session_state.task2_test_index += 1
-                st.rerun()
-            else:
-                st.warning("Выберите все варианты")
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            if st.button("Далее"):
+                if all(v is not None for v in matching.values()):
+                    st.session_state.task2_test_index += 1
+                    st.rerun()
+                else:
+                    st.warning("Выберите все варианты")
     else:
         st.header("Тренировка задания 2 завершена!")
         if st.button("Перейти к заданию 2"):
             st.session_state.current_step = 6
             st.rerun()
 
-# ОСНОВНОЕ ЗАДАНИЕ 2 (страница 6)
+
+# СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ 2
 elif st.session_state.current_step == 6:
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
     answ_co = len(task_data.person_middle_minus)
@@ -224,7 +219,7 @@ elif st.session_state.current_step == 6:
     if index < answ_co:
         st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
         
-        # ТЕКСТ ЗАДАНИЯ ДЛЯ ОСНОВНОЙ ЧАСТИ
+        # КРАТКОЕ ОПИСАНИЕ ДЛЯ ОСНОВНОЙ ЧАСТИ
         st.markdown(
             """
             <div class="custom-text">
@@ -237,15 +232,16 @@ elif st.session_state.current_step == 6:
         task = task_data.person_middle_minus[index]
         matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Сохранить ответ"):
-            if all(v is not None for v in matching.values()):
-                for i, time_text in enumerate(task["time"]):
-                    # Сохраняем текст события
-                    selected_event_text = task["event"][matching[i]]
-                    st.session_state.responses[f"Задание 2 (вопрос {index + 1}): {time_text}"] = selected_event_text
-                st.rerun()
-            else:
-                st.warning("Выберите все варианты")
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            if st.button("Сохранить ответ"):
+                if all(v is not None for v in matching.values()):
+                    for i, time_text in enumerate(task["time"]):
+                        selected_event_text = task["event"][matching[i]]
+                        st.session_state.responses[f"Задание 2 (вопрос {index + 1}): {time_text}"] = selected_event_text
+                    st.rerun()
+                else:
+                    st.warning("Выберите все варианты")
         
         # Кнопка пропуска
         st.markdown(
