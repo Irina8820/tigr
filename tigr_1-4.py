@@ -76,17 +76,12 @@ elif st.session_state.current_step == 3:
 
 # ==================== ЗАДАНИЕ 2 ====================
 def render_task2(time_list, event_list, key_prefix):
-    """Отображает задание на сопоставление с случайным порядком событий"""
+    """Отображает задание на сопоставление"""
     
     # Стилизация
     st.markdown(
         """
         <style>
-            .task2-container {
-                display: flex;
-                gap: 40px;
-                margin: 20px 0;
-            }
             .task2-time, .task2-event {
                 flex: 1;
                 border: 2px solid orange;
@@ -115,10 +110,6 @@ def render_task2(time_list, event_list, key_prefix):
         unsafe_allow_html=True,
     )
     
-    # Перемешиваем индексы событий (работает всегда)
-    shuffled_indices = list(range(len(event_list)))
-    random.shuffle(shuffled_indices)
-    
     # Два столбца
     col1, col2 = st.columns(2)
     
@@ -130,10 +121,9 @@ def render_task2(time_list, event_list, key_prefix):
     
     with col2:
         st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
-        for display_idx, orig_idx in enumerate(shuffled_indices):
-            letter = chr(65 + display_idx)
-            event_text = event_list[orig_idx]
-            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
+        # Показываем события в исходном порядке (без перемешивания)
+        for i, event in enumerate(event_list):
+            st.markdown(f'<div class="task2-item">{chr(65+i)}. {event}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
@@ -141,11 +131,7 @@ def render_task2(time_list, event_list, key_prefix):
     # Выпадающие списки для сопоставления
     matching = {}
     for i, time_text in enumerate(time_list):
-        options = []
-        for display_idx, orig_idx in enumerate(shuffled_indices):
-            letter = chr(65 + display_idx)
-            event_text = event_list[orig_idx]
-            options.append(f"{letter}. {event_text}")
+        options = [f"{chr(65+j)}. {event_list[j]}" for j in range(len(event_list))]
         
         selected = st.selectbox(
             f"Для «{time_text}» выберите событие:",
@@ -156,8 +142,8 @@ def render_task2(time_list, event_list, key_prefix):
         
         if selected:
             selected_letter = selected[0]
-            selected_display_idx = ord(selected_letter) - 65
-            matching[i] = shuffled_indices[selected_display_idx]
+            selected_index = ord(selected_letter) - 65
+            matching[i] = selected_index
         else:
             matching[i] = None
     
@@ -197,7 +183,7 @@ elif st.session_state.current_step == 5:
         st.markdown(
             """
             <div class="custom-text">
-                <p>Соедините время и соответствующее событие.</p>
+                <p>Соедините время и событие в этом примере.</p>
             </div>
             """,
             unsafe_allow_html=True,
