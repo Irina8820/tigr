@@ -76,9 +76,8 @@ elif st.session_state.current_step == 3:
 
 # ==================== ЗАДАНИЕ 2 ====================
 def render_task2(time_list, event_list, key_prefix):
-    """Отображает задание на сопоставление"""
+    """Отображает задание на сопоставление с случайным порядком событий"""
     
-    # Стилизация
     st.markdown(
         """
         <style>
@@ -110,7 +109,6 @@ def render_task2(time_list, event_list, key_prefix):
         unsafe_allow_html=True,
     )
     
-    # Два столбца
     col1, col2 = st.columns(2)
     
     with col1:
@@ -121,87 +119,39 @@ def render_task2(time_list, event_list, key_prefix):
     
     with col2:
         st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
-        for i, e in enumerate(event_list):
-            st.markdown(f'<div class="task2-item">{chr(65+i)}. {e}</div>', unsafe_allow_html=True)
+        
+        # Перемешиваем события
+        shuffled_events = list(enumerate(event_list))
+        random.shuffle(shuffled_events)
+        
+        letter_to_index = {}
+        for display_idx, (orig_idx, event_text) in enumerate(shuffled_events):
+            letter = chr(65 + display_idx)
+            letter_to_index[letter] = orig_idx
+            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
+        
         st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
     
-    # Выпадающие списки
     matching = {}
     for i, time_text in enumerate(time_list):
-        options = [f"{chr(65+j)}. {event_list[j]}" for j in range(len(event_list))]
-        matching[i] = st.selectbox(
-            f"«{time_text}»:",
-            options=options,
+        display_options = [f"{chr(65+j)}. {event_text}" for j, (_, event_text) in enumerate(shuffled_events)]
+        
+        selected = st.selectbox(
+            f"Для «{time_text}» выберите событие:",
+            options=display_options,
             key=f"{key_prefix}_match_{i}",
             index=None
         )
+        
+        if selected:
+            selected_letter = selected[0]
+            matching[i] = letter_to_index[selected_letter]
+        else:
+            matching[i] = None
     
     return matching
-
-
-if st.session_state.current_step == 4:
-    st.header("Задание 2")
-    st.markdown(
-        """
-        <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
-        <div class="custom-text">
-            <p>Вы увидите 3 маркера времени и 3 предложения.</p>
-            <p>Для каждого времени выберите соответствующее предложение из выпадающего списка.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    if st.button("Начать тренировку"):
-        st.session_state.current_step = 5
-        st.session_state.task2_test_index = 0
-        st.rerun()
-
-elif st.session_state.current_step == 5:
-    index = st.session_state.task2_test_index
-    
-    if index < len(task_data.person_middle_minus_test):
-        st.header("Тренировка задания 2")
-        task = task_data.person_middle_minus_test[index]
-        matching = render_task2(task["time"], task["event"], f"train2_{index}")
-        
-        if st.button("Далее"):
-            if all(v is not None for v in matching.values()):
-                st.session_state.task2_test_index += 1
-                st.rerun()
-            else:
-                st.warning("Выберите все варианты")
-    else:
-        st.header("Тренировка задания 2 завершена!")
-        if st.button("Перейти к заданию 2"):
-            st.session_state.current_step = 6
-            st.rerun()
-
-elif st.session_state.current_step == 6:
-    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
-    answ_co = len(task_data.person_middle_minus)
-    
-    if index < answ_co:
-        st.header("Задание 2")
-        task = task_data.person_middle_minus[index]
-        matching = render_task2(task["time"], task["event"], f"task2_{index}")
-        
-        if st.button("Далее"):
-            if all(v is not None for v in matching.values()):
-                for i, time_text in enumerate(task["time"]):
-                    st.session_state.responses[f"Задание 2: {time_text}"] = matching[i]
-                st.rerun()
-            else:
-                st.warning("Выберите все варианты")
-        
-        func.skip_task(st, index, answ_co, "Задание 2: ")
-    else:
-        st.header("Задание 2 завершено!")
-        if st.button("Перейти к следующему заданию"):
-            st.session_state.current_step = 7
-            st.rerun()
-
 # ==================== ЗАДАНИЕ 3 ====================
 if st.session_state.current_step == 7:
     st.header("Задание 3")
