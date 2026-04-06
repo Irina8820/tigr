@@ -132,7 +132,7 @@ def render_task2(time_list, event_list, key_prefix):
     for i, time_text in enumerate(time_list):
         options = [f"{chr(65+j)}. {event_list[j]}" for j in range(len(event_list))]
         matching[i] = st.selectbox(
-            f"Для «{time_text}» выберите событие:",
+            f"«{time_text}»:",
             options=options,
             key=f"{key_prefix}_match_{i}",
             index=None
