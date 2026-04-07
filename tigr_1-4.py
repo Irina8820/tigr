@@ -282,18 +282,21 @@ elif st.session_state.current_step == 8:
     if index < len(task_data.person_middle_plus_test):
         st.header("Тренировка задания 3")
         
-        # Получаем данные для тренировки
         task = task_data.person_middle_plus_test[index]
         stimulus = task["stimulus_text"]
         answers = task["answers"]
         
-        # Отображаем задание
-        st.write(stimulus)
+        # Перемешиваем только один раз
+        shuffle_key = f"shuffled_train3_{index}"
+        if shuffle_key not in st.session_state:
+            import random
+            shuffled = list(answers)
+            random.shuffle(shuffled)
+            st.session_state[shuffle_key] = shuffled
         
-        # Перемешиваем ответы
-        import random
-        shuffled_answers = list(answers)
-        random.shuffle(shuffled_answers)
+        shuffled_answers = st.session_state[shuffle_key]
+        
+        st.write(stimulus)
         
         choice = st.radio(
             "Выберите правильный вариант:",
@@ -305,6 +308,7 @@ elif st.session_state.current_step == 8:
         if st.button("Далее"):
             if choice is not None:
                 st.session_state.task3_test_index += 1
+                del st.session_state[shuffle_key]
                 st.rerun()
             else:
                 st.warning("Пожалуйста, выберите ответ.")
@@ -321,18 +325,21 @@ elif st.session_state.current_step == 9:
     if index < answ_co:
         st.header("Задание 3")
         
-        # Получаем данные для основного задания
         task = task_data.person_middle_plus[index]
         stimulus = task["stimulus_text"]
         answers = task["answers"]
         
-        # Отображаем задание
-        st.write(stimulus)
+        # Перемешиваем только один раз
+        shuffle_key = f"shuffled_task3_{index}"
+        if shuffle_key not in st.session_state:
+            import random
+            shuffled = list(answers)
+            random.shuffle(shuffled)
+            st.session_state[shuffle_key] = shuffled
         
-        # Перемешиваем ответы
-        import random
-        shuffled_answers = list(answers)
-        random.shuffle(shuffled_answers)
+        shuffled_answers = st.session_state[shuffle_key]
+        
+        st.write(stimulus)
         
         choice = st.radio(
             "Выберите правильный вариант:",
@@ -344,11 +351,11 @@ elif st.session_state.current_step == 9:
         if st.button("Сохранить ответ"):
             if choice is not None:
                 st.session_state.responses[f"Задание 3 (вопрос {index + 1}): {stimulus}"] = choice
+                del st.session_state[shuffle_key]
                 st.rerun()
             else:
                 st.warning("Пожалуйста, выберите ответ.")
         
-        # Кнопка пропуска
         func.skip_task(st, index, answ_co, "Задание 3: ")
     
     else:
