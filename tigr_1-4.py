@@ -265,7 +265,7 @@ if st.session_state.current_step == 7:
         <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным словом.</p>
-            <p>Вы увидите 3 варианта ответов.</p>
+            <p>Вы увидите варианты ответов.</p>
             <p>Выберите правильную форму слова.</p>
         </div>
         """,
@@ -286,11 +286,38 @@ elif st.session_state.current_step == 8:
         stimulus = task["stimulus_text"]
         answers = task["answers"]
         
+        # ОБЪЕДИНЯЕМ ВАРИАНТЫ С РАЗНЫМ РОДОМ
+        merged_answers = []
+        skip_next = False
+        for i, ans in enumerate(answers):
+            if skip_next:
+                skip_next = False
+                continue
+            
+            # Проверяем, есть ли следующий вариант с таким же корнем (женский род)
+            if i + 1 < len(answers):
+                # Разбиваем на корень и окончание
+                if ans.endswith("л") and answers[i+1].endswith("ла"):
+                    # объединяем мужской и женский род
+                    merged_answers.append(f"{ans}/{answers[i+1]}")
+                    skip_next = True
+                elif ans.endswith("лся") and answers[i+1].endswith("лась"):
+                    merged_answers.append(f"{ans}/{answers[i+1]}")
+                    skip_next = True
+                else:
+                    merged_answers.append(ans)
+            else:
+                merged_answers.append(ans)
+        
+        # Если объединённых ответов нет, используем исходные
+        if not merged_answers:
+            merged_answers = list(answers)
+        
         # Перемешиваем только один раз
         shuffle_key = f"shuffled_train3_{index}"
         if shuffle_key not in st.session_state:
             import random
-            shuffled = list(answers)
+            shuffled = list(merged_answers)
             random.shuffle(shuffled)
             st.session_state[shuffle_key] = shuffled
         
@@ -329,11 +356,41 @@ elif st.session_state.current_step == 9:
         stimulus = task["stimulus_text"]
         answers = task["answers"]
         
+        # ОБЪЕДИНЯЕМ ВАРИАНТЫ С РАЗНЫМ РОДОМ
+        merged_answers = []
+        skip_next = False
+        for i, ans in enumerate(answers):
+            if skip_next:
+                skip_next = False
+                continue
+            
+            # Проверяем, есть ли следующий вариант с таким же корнем (женский род)
+            if i + 1 < len(answers):
+                # объединяем мужской и женский род
+                if ans.endswith("л") and answers[i+1].endswith("ла"):
+                    merged_answers.append(f"{ans}/{answers[i+1]}")
+                    skip_next = True
+                elif ans.endswith("лся") and answers[i+1].endswith("лась"):
+                    merged_answers.append(f"{ans}/{answers[i+1]}")
+                    skip_next = True
+                elif ans.endswith("л(а)") or ans.endswith("л (а)"):
+                    # Убираем пометку (а)
+                    clean_ans = ans.replace("(а)", "").replace("(а) ", "").strip()
+                    merged_answers.append(clean_ans)
+                else:
+                    merged_answers.append(ans)
+            else:
+                merged_answers.append(ans)
+        
+        # Если объединённых ответов нет, используем исходные
+        if not merged_answers:
+            merged_answers = list(answers)
+        
         # Перемешиваем только один раз
         shuffle_key = f"shuffled_task3_{index}"
         if shuffle_key not in st.session_state:
             import random
-            shuffled = list(answers)
+            shuffled = list(merged_answers)
             random.shuffle(shuffled)
             st.session_state[shuffle_key] = shuffled
         
