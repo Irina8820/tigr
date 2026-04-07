@@ -1,2 +1,2 @@
 # tigr
-https://tigr1to4.streamlit.app/ "ссылка на приложение"
+ссылка на приложение https://tigr1to4.streamlit.app/
