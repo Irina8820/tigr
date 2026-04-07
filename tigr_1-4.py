@@ -281,15 +281,33 @@ elif st.session_state.current_step == 8:
 
     if index < len(task_data.person_middle_plus_test):
         st.header("Тренировка задания 3")
+        
+        # Получаем данные для тренировки
         task = task_data.person_middle_plus_test[index]
-        result = func.render_middle_minus_task(st, task, index, "train3")
-
+        stimulus = task["stimulus_text"]
+        answers = task["answers"]
+        
+        # Отображаем задание
+        st.write(stimulus)
+        
+        # Перемешиваем ответы
+        import random
+        shuffled_answers = list(answers)
+        random.shuffle(shuffled_answers)
+        
+        choice = st.radio(
+            "Выберите правильный вариант:",
+            options=shuffled_answers,
+            key=f"train3_{index}",
+            index=None
+        )
+        
         if st.button("Далее"):
-            if all(v is not None for v in result.values()):
+            if choice is not None:
                 st.session_state.task3_test_index += 1
                 st.rerun()
             else:
-                st.warning("Выберите все варианты")
+                st.warning("Пожалуйста, выберите ответ.")
     else:
         st.header("Тренировка задания 3 завершена!")
         if st.button("Перейти к заданию 3"):
@@ -297,23 +315,42 @@ elif st.session_state.current_step == 8:
             st.rerun()
 
 elif st.session_state.current_step == 9:
-    index = int(len([k for k in st.session_state.responses.keys() if k.startswith("Задание 3")]) / 6)
+    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 3")])
     answ_co = len(task_data.person_middle_plus)
 
     if index < answ_co:
         st.header("Задание 3")
+        
+        # Получаем данные для основного задания
         task = task_data.person_middle_plus[index]
-        result = func.render_middle_minus_task(st, task, index, "Задание3")
-
-        if st.button("Далее"):
-            if all(v is not None for v in result.values()):
-                for i, subject in enumerate(task["subjects"]):
-                    st.session_state.responses[f"Задание 3 (итерация {index}): {subject}"] = result[i]
+        stimulus = task["stimulus_text"]
+        answers = task["answers"]
+        
+        # Отображаем задание
+        st.write(stimulus)
+        
+        # Перемешиваем ответы
+        import random
+        shuffled_answers = list(answers)
+        random.shuffle(shuffled_answers)
+        
+        choice = st.radio(
+            "Выберите правильный вариант:",
+            options=shuffled_answers,
+            key=f"task3_{index}",
+            index=None
+        )
+        
+        if st.button("Сохранить ответ"):
+            if choice is not None:
+                st.session_state.responses[f"Задание 3 (вопрос {index + 1}): {stimulus}"] = choice
                 st.rerun()
             else:
-                st.warning("Выберите все варианты")
-
-        func.skip_task(st, index * 6, answ_co * 6, "Задание 3: ")
+                st.warning("Пожалуйста, выберите ответ.")
+        
+        # Кнопка пропуска
+        func.skip_task(st, index, answ_co, "Задание 3: ")
+    
     else:
         st.header("Задание 3 завершено!")
         if st.button("Перейти к следующему заданию"):
