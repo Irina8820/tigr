@@ -76,12 +76,10 @@ elif st.session_state.current_step == 3:
             st.rerun()
 
 # ==================== ЗАДАНИЕ 2 ====================
-# ==================== ЗАДАНИЕ 2 ====================
-
 def render_task2(time_list, event_list, key_prefix):
     """Отображает задание на сопоставление со случайным порядком событий"""
     
-    # Стилизация (возвращаем прикольный дизайн)
+    # Стилизация
     st.markdown(
         """
         <style>
@@ -201,7 +199,7 @@ elif st.session_state.current_step == 5:
         st.markdown(
             """
             <div class="custom-text">
-                <p>Соедините время и событие в этом примере.</p>
+                <p>Соедините время с событием</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -242,7 +240,7 @@ elif st.session_state.current_step == 6:
         task = task_data.person_middle_minus[index]
         matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Сохранить ответ"):
+        if st.button("Далее"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
