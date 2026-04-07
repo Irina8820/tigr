@@ -265,7 +265,7 @@ if st.session_state.current_step == 7:
         <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным словом.</p>
-            <p>Вы увидите варианты ответов.</p>
+            <p>Ниже будут представлены 3 варианта ответов</p>
             <p>Выберите правильную форму слова.</p>
         </div>
         """,
@@ -498,7 +498,7 @@ if st.session_state.current_step == 10:
         <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным словом.</p>
-            <p>После пропуска будет написано слово в скобках.</p>
+            <p>Рядом с пропуском будет написано слово (в скобках)</p>
             <p>Напечатайте пропущенное слово (в скобках) в подходящей форме.</p>
         </div>
         """,
