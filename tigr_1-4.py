@@ -3,6 +3,7 @@
 import streamlit as st
 import task_data
 import func
+import random
 
 # Инициализация состояния страницы
 if "current_step" not in st.session_state:
