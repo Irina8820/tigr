@@ -77,7 +77,7 @@ elif st.session_state.current_step == 3:
 
 # ==================== ЗАДАНИЕ 2 ====================
 def render_task2(time_list, event_list, key_prefix):
-    """Отображает задание на сопоставление со случайным порядком событий"""
+    """Отображает задание на сопоставление"""
     
     # Стилизация
     st.markdown(
@@ -111,11 +111,6 @@ def render_task2(time_list, event_list, key_prefix):
         unsafe_allow_html=True,
     )
     
-    # СОЗДАЁМ СЛУЧАЙНЫЙ ПОРЯДОК СОБЫТИЙ (без изменения исходного списка)
-    import random
-    indices = list(range(len(event_list)))  # [0, 1, 2]
-    random.shuffle(indices)  # перемешиваем, например [2, 0, 1]
-    
     # Два столбца
     col1, col2 = st.columns(2)
     
@@ -127,11 +122,9 @@ def render_task2(time_list, event_list, key_prefix):
     
     with col2:
         st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
-        # Показываем события в случайном порядке
-        for display_idx, original_idx in enumerate(indices):
-            letter = chr(65 + display_idx)  # A, B, C
-            event_text = event_list[original_idx]
-            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
+        # Показываем события в исходном порядке (без перемешивания)
+        for i, event in enumerate(event_list):
+            st.markdown(f'<div class="task2-item">{chr(65+i)}. {event}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
@@ -139,12 +132,7 @@ def render_task2(time_list, event_list, key_prefix):
     # Выпадающие списки для сопоставления
     matching = {}
     for i, time_text in enumerate(time_list):
-        # Создаём варианты в том же случайном порядке
-        options = []
-        for display_idx, original_idx in enumerate(indices):
-            letter = chr(65 + display_idx)
-            event_text = event_list[original_idx]
-            options.append(f"{letter}. {event_text}")
+        options = [f"{chr(65+j)}. {event_list[j]}" for j in range(len(event_list))]
         
         selected = st.selectbox(
             f"«{time_text}»:",
@@ -155,13 +143,108 @@ def render_task2(time_list, event_list, key_prefix):
         
         if selected:
             selected_letter = selected[0]
-            selected_display_idx = ord(selected_letter) - 65  # A=0, B=1, C=2
-            original_idx = indices[selected_display_idx]
-            matching[i] = original_idx
+            selected_index = ord(selected_letter) - 65
+            matching[i] = selected_index
         else:
             matching[i] = None
     
     return matching
+
+
+# СТРАНИЦА 4: ИНСТРУКЦИЯ К ЗАДАНИЮ 2
+if st.session_state.current_step == 4:
+    st.header("Задание 2")
+    
+    # ОПИСАНИЕ ЗАДАНИЯ
+    st.markdown(
+        """
+        <div class="custom-text">
+            <p>Вы увидите три указателя времени (слева) и три события (справа).</p>
+            <p>Вам необходимо соединить каждый указатель времени с соответсвующим событием.</p>
+            <p>Для каждого времени выберите подходящее событие из выпадающего списка.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    if st.button("Начать тренировку"):
+        st.session_state.current_step = 5
+        st.session_state.task2_test_index = 0
+        st.rerun()
+
+
+# СТРАНИЦА 5: ТРЕНИРОВКА ЗАДАНИЯ 2
+elif st.session_state.current_step == 5:
+    index = st.session_state.task2_test_index
+    
+    if index < len(task_data.person_middle_minus_test):
+        st.header("Тренировка задания 2")
+        
+        # КРАТКОЕ ОПИСАНИЕ ДЛЯ ТРЕНИРОВКИ
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините время и событие в этом примере.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        task = task_data.person_middle_minus_test[index]
+        matching = render_task2(task["time"], task["event"], f"train2_{index}")
+        
+        if st.button("Далее"):
+            if all(v is not None for v in matching.values()):
+                st.session_state.task2_test_index += 1
+                st.rerun()
+            else:
+                st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
+    else:
+        st.header("Тренировка задания 2 завершена!")
+        if st.button("Перейти к заданию 2"):
+            st.session_state.current_step = 6
+            st.rerun()
+
+
+# СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ 2
+elif st.session_state.current_step == 6:
+    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
+    answ_co = len(task_data.person_middle_minus)
+    
+    if index < answ_co:
+        st.header(f"Задание 2")
+        
+        # КРАТКОЕ ОПИСАНИЕ ДЛЯ ОСНОВНОЙ ЧАСТИ
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините указатели времени с соответствующими событиями.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        task = task_data.person_middle_minus[index]
+        matching = render_task2(task["time"], task["event"], f"task2_{index}")
+        
+        if st.button("Далее"):
+            if all(v is not None for v in matching.values()):
+                for i, time_text in enumerate(task["time"]):
+                    selected_event_text = task["event"][matching[i]]
+                    st.session_state.responses[f"Задание 2 (вопрос {index + 1}): {time_text}"] = selected_event_text
+                st.rerun()
+            else:
+                st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
+        
+        # Кнопка пропуска
+        
+        func.skip_task(st, index, answ_co, "Задание 2: ")
+            
+    else:
+        st.header("Задание 2 завершено!")
+        if st.button("Перейти к следующему заданию"):
+            st.session_state.current_step = 7
+            st.rerun()
 # ==================== ЗАДАНИЕ 3 ====================
 if st.session_state.current_step == 7:
     st.header("Задание 3")
