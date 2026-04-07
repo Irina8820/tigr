@@ -76,6 +76,104 @@ elif st.session_state.current_step == 3:
             st.rerun()
 
 # ==================== ЗАДАНИЕ 2 ====================
+# ==================== ЗАДАНИЕ 2 ====================
+
+def render_task2(time_list, event_list, key_prefix):
+    """Отображает задание на сопоставление со случайным порядком событий"""
+    
+    # Стилизация (возвращаем прикольный дизайн)
+    st.markdown(
+        """
+        <style>
+            .task2-container {
+                display: flex;
+                gap: 40px;
+                margin: 20px 0;
+            }
+            .task2-time, .task2-event {
+                flex: 1;
+                border: 2px solid orange;
+                background-color: #ffebcc;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            .task2-time h4, .task2-event h4 {
+                text-align: center;
+                margin: 0 0 15px 0;
+            }
+            .task2-item {
+                padding: 10px;
+                margin: 10px 0;
+                background-color: white;
+                border-radius: 5px;
+                border-left: 4px solid orange;
+            }
+            .custom-text {
+                font-size: 18px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    # СОЗДАЁМ СЛУЧАЙНЫЙ ПОРЯДОК (без random.shuffle)
+    # Используем key_prefix как seed для стабильного перемешивания в рамках одного задания
+    indices = list(range(len(event_list)))
+    
+    # Простое перемешивание на основе суммы символов key_prefix
+    seed = sum(ord(c) for c in key_prefix) % 100
+    for i in range(len(indices) - 1, 0, -1):
+        j = (seed + i) % (i + 1)
+        indices[i], indices[j] = indices[j], indices[i]
+    
+    # Два столбца с дизайном
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown('<div class="task2-time"><h4>📅 Время</h4>', unsafe_allow_html=True)
+        for i, t in enumerate(time_list):
+            st.markdown(f'<div class="task2-item">{i+1}. {t}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    with col2:
+        st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
+        for display_idx, original_idx in enumerate(indices):
+            letter = chr(65 + display_idx)
+            event_text = event_list[original_idx]
+            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Выпадающие списки
+    matching = {}
+    for i, time_text in enumerate(time_list):
+        options = []
+        for display_idx, original_idx in enumerate(indices):
+            letter = chr(65 + display_idx)
+            event_text = event_list[original_idx]
+            options.append(f"{letter}. {event_text}")
+        
+        selected = st.selectbox(
+            f"«{time_text}»:",
+            options=options,
+            key=f"{key_prefix}_match_{i}",
+            index=None
+        )
+        
+        if selected:
+            selected_letter = selected[0]
+            selected_display_idx = ord(selected_letter) - 65
+            matching[i] = indices[selected_display_idx]
+        else:
+            matching[i] = None
+    
+    return matching
+
+
+# СТРАНИЦА 4: ИНСТРУКЦИЯ
 if st.session_state.current_step == 4:
     st.header("Задание 2")
     st.markdown(
@@ -96,45 +194,28 @@ if st.session_state.current_step == 4:
 
 # СТРАНИЦА 5: ТРЕНИРОВКА
 elif st.session_state.current_step == 5:
-    st.write(f"DEBUG: step=5, index={st.session_state.task2_test_index}")
-    
     index = st.session_state.task2_test_index
     
     if index < len(task_data.person_middle_minus_test):
         st.header("Тренировка задания 2")
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините время и событие в этом примере.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         
         task = task_data.person_middle_minus_test[index]
-        
-        # Показываем время и события
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write("**Время:**")
-            for i, t in enumerate(task["time"]):
-                st.write(f"{i+1}. {t}")
-        with col2:
-            st.write("**Событие:**")
-            for i, e in enumerate(task["event"]):
-                st.write(f"{chr(65+i)}. {e}")
-        
-        st.markdown("---")
-        
-        # Выпадающие списки
-        matching = {}
-        for i, time_text in enumerate(task["time"]):
-            options = [f"{chr(65+j)}. {task['event'][j]}" for j in range(len(task["event"]))]
-            matching[i] = st.selectbox(
-                f"Для «{time_text}» выберите событие:",
-                options=options,
-                key=f"train2_match_{i}_{index}",
-                index=None
-            )
+        matching = render_task2(task["time"], task["event"], f"train2_{index}")
         
         if st.button("Далее"):
             if all(v is not None for v in matching.values()):
                 st.session_state.task2_test_index += 1
                 st.rerun()
             else:
-                st.warning("Выберите все варианты")
+                st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
     else:
         st.header("Тренировка задания 2 завершена!")
         if st.button("Перейти к заданию 2"):
@@ -149,43 +230,26 @@ elif st.session_state.current_step == 6:
     
     if index < answ_co:
         st.header("Задание 2")
+        st.markdown(
+            """
+            <div class="custom-text">
+                <p>Соедините указатели времени с соответствующими событиями.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         
         task = task_data.person_middle_minus[index]
-        
-        # Показываем время и события
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write("**Время:**")
-            for i, t in enumerate(task["time"]):
-                st.write(f"{i+1}. {t}")
-        with col2:
-            st.write("**Событие:**")
-            for i, e in enumerate(task["event"]):
-                st.write(f"{chr(65+i)}. {e}")
-        
-        st.markdown("---")
-        
-        # Выпадающие списки
-        matching = {}
-        for i, time_text in enumerate(task["time"]):
-            options = [f"{chr(65+j)}. {task['event'][j]}" for j in range(len(task["event"]))]
-            matching[i] = st.selectbox(
-                f"Для «{time_text}» выберите событие:",
-                options=options,
-                key=f"task2_match_{i}_{index}",
-                index=None
-            )
+        matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
         if st.button("Сохранить ответ"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
-                    selected_letter = matching[i][0]
-                    selected_index = ord(selected_letter) - 65
-                    selected_event_text = task["event"][selected_index]
+                    selected_event_text = task["event"][matching[i]]
                     st.session_state.responses[f"Задание 2 (вопрос {index + 1}): {time_text}"] = selected_event_text
                 st.rerun()
             else:
-                st.warning("Выберите все варианты")
+                st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
         
         # Кнопка пропуска
         func.skip_task(st, index, answ_co, "Задание 2: ")
