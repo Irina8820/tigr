@@ -237,11 +237,8 @@ elif st.session_state.current_step == 6:
         
         # Кнопка пропуска
         
-        if st.button("Пропустить задание", key="skip"):
-            for i in range(index + 1, answ_co + 1):
-                st.session_state.responses[f"Задание 2: вопрос{i}"] = 0
-            st.rerun()
-    
+        func.skip_task(st, index, answ_co, "Задание 2: ")
+            
     else:
         st.header("Задание 2 завершено!")
         if st.button("Перейти к следующему заданию"):
