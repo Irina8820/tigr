@@ -264,8 +264,9 @@ if st.session_state.current_step == 7:
         """
         <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
         <div class="custom-text">
-            <p>Вы увидите предложение с пропущенным глаголом.</p>
-            <p>Вам необходимо выбрать правильную форму слова.</p>
+            <p>Вы увидите предложение с пропущенным словом.</p>
+            <p>Вы увидите 3 варианта ответов.</p>
+            <p>Выберите правильную форму слова.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -288,7 +289,7 @@ elif st.session_state.current_step == 8:
                 st.session_state.task3_test_index += 1
                 st.rerun()
             else:
-                st.warning("Выберите все варианты перед переходом.")
+                st.warning("Выберите все варианты")
     else:
         st.header("Тренировка задания 3 завершена!")
         if st.button("Перейти к заданию 3"):
@@ -310,7 +311,7 @@ elif st.session_state.current_step == 9:
                     st.session_state.responses[f"Задание 3 (итерация {index}): {subject}"] = result[i]
                 st.rerun()
             else:
-                st.warning("Выберите все варианты перед переходом.")
+                st.warning("Выберите все варианты")
 
         func.skip_task(st, index * 6, answ_co * 6, "Задание 3: ")
     else:
