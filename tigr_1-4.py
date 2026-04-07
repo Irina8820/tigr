@@ -211,7 +211,7 @@ elif st.session_state.current_step == 6:
     answ_co = len(task_data.person_middle_minus)
     
     if index < answ_co:
-        st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
+        st.header(f"Задание 2")
         
         # КРАТКОЕ ОПИСАНИЕ ДЛЯ ОСНОВНОЙ ЧАСТИ
         st.markdown(
