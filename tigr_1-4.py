@@ -5,6 +5,13 @@ import task_data
 import func
 import random
 
+# Перемешиваем и берём 50 случайных примеров только для основного задания 1
+if "shuffled_task1" not in st.session_state:
+    shuffled_task1 = task_data.person_easy.copy()
+    random.shuffle(shuffled_task1)
+    st.session_state.shuffled_task1 = shuffled_task1[:50]
+    print(f"Создано задание 1 с {len(st.session_state.shuffled_task1)} примерами")  # отладка
+
 # Инициализация состояния страницы
 if "current_step" not in st.session_state:
     st.session_state.current_step = 0
