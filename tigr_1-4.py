@@ -42,6 +42,7 @@ if st.session_state.current_step == 1:
         st.rerun()
 
 elif st.session_state.current_step == 2:
+    # ТРЕНИРОВКА - БЕЗ ИЗМЕНЕНИЙ
     training_data = task_data.person_easy_test
     index = st.session_state.training_index
 
@@ -58,14 +59,15 @@ elif st.session_state.current_step == 2:
             st.rerun()
 
 elif st.session_state.current_step == 3:
+    # ОСНОВНОЕ ЗАДАНИЕ - ИСПОЛЬЗУЕМ 50 СЛУЧАЙНЫХ ПРИМЕРОВ
     index = len(st.session_state.responses)
-    answ_co = len(task_data.person_easy)
+    answ_co = len(st.session_state.shuffled_task1)  # 50 случайных примеров
 
     if index < answ_co:
-        st.header("Задание 1")
-        answer = func.render_task(st, task_data.person_easy[index], "easy", index, "Задание1")
+        st.header(f"Задание 1 (вопрос {index + 1} из {answ_co})")
+        answer = func.render_task(st, st.session_state.shuffled_task1[index], "easy", index, "Задание1")
         if answer is not None:
-            st.session_state.responses[f"Задание 1: {task_data.person_easy[index]['stimulus_text']}"] = answer
+            st.session_state.responses[f"Задание 1: {st.session_state.shuffled_task1[index]['stimulus_text']}"] = answer
             st.rerun()
 
         func.skip_task(st, index, answ_co, "Задание 1: ")
