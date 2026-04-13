@@ -72,6 +72,8 @@ def render_easy_task(st, task, task_index, task_name):
     Отображение задания типа person_easy
     Формат: {'prime_text': str, 'stimulus_text': str, 'answers': tuple, 'hint': str}
     """
+    # Получаем ответы
+    answers = task['answers']
     # Перемешиваем ответы
     answers_list = list(task['answers'])
     random.shuffle(answers_list)
