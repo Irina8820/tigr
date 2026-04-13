@@ -226,7 +226,7 @@ if "shuffled_task2" not in st.session_state:
         else:
             matching[i] = None
     
-return matching
+        return matching
 
 
 # СТРАНИЦА 4: ИНСТРУКЦИЯ
