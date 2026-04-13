@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-
+import random
 
 def skip_task(st, curr_index=int, max_index=int, task_name=str):
     st.markdown(
