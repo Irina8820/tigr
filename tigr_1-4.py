@@ -130,7 +130,7 @@ task = st.session_state.shuffled_task2[index]
 matching = func.render_middle_minus_task(st, task, index, "task2")
 
     # Стилизация
-    st.markdown(
+st.markdown(
         """
         <style>
             .task2-container {
