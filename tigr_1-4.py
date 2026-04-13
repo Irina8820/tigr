@@ -116,17 +116,7 @@ elif st.session_state.current_step == 3:
     else:
         st.header("Задание 1 завершено!")
 
-        st.write("---")
-        st.subheader("💾 Сохранение результатов")
-        
-        saved = save_results_partial(st, "Задание 1")
-        
-        if saved:
-            st.success("Результаты задания 1 сохранены! Скачайте файл выше.")
-        else:
-            st.info("Нет ответов для сохранения.")
-        
-        st.write("---")
+        func.save_and_download_result(st, "Задание 1")
         
         if st.button("Перейти к следующему заданию"):
             st.session_state.current_step = 4
