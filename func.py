@@ -45,7 +45,7 @@ def save_result(st):
             custom_filename = custom_filename[:50]
             filename = f"{custom_filename}.csv"
             df = pd.DataFrame(list(st.session_state.responses.items()), columns=["Вопрос", "Ответ"])
-            df.to_csv(filename, index=False)
+            df.to_csv(filename, index=False, encoding= 'utf-8-sig')
 
             with open(filename, "rb") as f:
                 st.download_button(
