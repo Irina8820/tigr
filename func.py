@@ -156,16 +156,18 @@ def render_easy_task(st, task, task_index, task_name):
     )
 
 
-def render_middle_minus_task(st, task, task_index, task_name):
-    """
-    Отображение задания типа person_middle_minus (сопоставление времени и события)
-    Формат: {'time': list, 'event': list}
-    """
+def render_task2(time_list, event_list, key_prefix):
+    """Отображает задание на сопоставление со случайным порядком событий"""
     
     # Стилизация
     st.markdown(
         """
         <style>
+            .task2-container {
+                display: flex;
+                gap: 40px;
+                margin: 20px 0;
+            }
             .task2-time, .task2-event {
                 flex: 1;
                 border: 2px solid orange;
@@ -184,30 +186,39 @@ def render_middle_minus_task(st, task, task_index, task_name):
                 border-radius: 5px;
                 border-left: 4px solid orange;
             }
+            .custom-text {
+                font-size: 18px;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
         </style>
         """,
         unsafe_allow_html=True,
     )
     
-    # ПЕРЕМЕШИВАЕМ СОБЫТИЯ В СЛУЧАЙНОМ ПОРЯДКЕ
-    import random
-    indices = list(range(len(task['event'])))
-    random.shuffle(indices)
+    # СОЗДАЁМ СЛУЧАЙНЫЙ ПОРЯДОК
+    indices = list(range(len(event_list)))
     
-    # Два столбца
+    # Используем key_prefix как seed для стабильного перемешивания
+    seed = sum(ord(c) for c in key_prefix) % 100
+    for i in range(len(indices) - 1, 0, -1):
+        j = (seed + i) % (i + 1)
+        indices[i], indices[j] = indices[j], indices[i]
+    
+    # Два столбца с дизайном
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown('<div class="task2-time"><h4>📅 Время</h4>', unsafe_allow_html=True)
-        for i, time_text in enumerate(task['time']):
-            st.markdown(f'<div class="task2-item">{i+1}. {time_text}</div>', unsafe_allow_html=True)
+        for i, t in enumerate(time_list):
+            st.markdown(f'<div class="task2-item">{i+1}. {t}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     with col2:
         st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
         for display_idx, original_idx in enumerate(indices):
             letter = chr(65 + display_idx)
-            event_text = task['event'][original_idx]
+            event_text = event_list[original_idx]
             st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
@@ -215,17 +226,17 @@ def render_middle_minus_task(st, task, task_index, task_name):
     
     # Выпадающие списки
     matching = {}
-    for i, time_text in enumerate(task['time']):
+    for i, time_text in enumerate(time_list):
         options = []
         for display_idx, original_idx in enumerate(indices):
             letter = chr(65 + display_idx)
-            event_text = task['event'][original_idx]
+            event_text = event_list[original_idx]
             options.append(f"{letter}. {event_text}")
         
         selected = st.selectbox(
             f"«{time_text}»:",
             options=options,
-            key=f"{task_name}_{task_index}_match_{i}",
+            key=f"{key_prefix}_match_{i}",
             index=None
         )
         
@@ -236,8 +247,7 @@ def render_middle_minus_task(st, task, task_index, task_name):
         else:
             matching[i] = None
     
-    return matching
-
+    return matching  # ЭТОТ RETURN ДОЛЖЕН БЫТЬ ВНУТРИ ФУНКЦИИ
 
 def render_middle_plus_task(st, task, task_index, task_name):
     """
