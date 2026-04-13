@@ -33,27 +33,34 @@ def skip_task(st, curr_index=int, max_index=int, task_name=str):
         st.rerun()
 
 
-def save_result(st):
-    custom_filename = st.text_input(
-        "Введите название файла для сохранения результатов (без расширения .csv):"
-    )
-
-    if st.button("Сохранить результаты"):
-        if not custom_filename.strip():
-            st.warning("Пожалуйста, введите название файла.")
-        else:
-            custom_filename = custom_filename[:50]
-            filename = f"{custom_filename}.csv"
-            df = pd.DataFrame(list(st.session_state.responses.items()), columns=["Вопрос", "Ответ"])
-            df.to_csv(filename, index=False, encoding= 'utf-8-sig')
-
-            with open(filename, "rb") as f:
-                st.download_button(
-                    label="Скачать результаты",
-                    data=f,
-                    file_name=filename,
-                    mime="text/csv"
-                )
+def save_and_download_result(st, task_name):
+    """Сохраняет результаты и сразу предлагает скачать файл"""
+    from datetime import datetime
+    import pandas as pd
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results_{task_name}_{timestamp}.csv"
+    
+    # Фильтруем ответы по текущему заданию
+    task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)}
+    
+    if task_responses:
+        df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
+        df.to_csv(filename, index=False, encoding='utf-8-sig')
+        
+        # Показываем кнопку для скачивания
+        with open(filename, "rb") as f:
+            st.download_button(
+                label=f"📥 Скачать результаты задания {task_name}",
+                data=f,
+                file_name=filename,
+                mime="text/csv"
+            )
+        st.success(f"✅ Результаты задания {task_name} готовы к скачиванию!")
+        return True
+    else:
+        st.info("Нет ответов для сохранения")
+        return False
 
 
 # ==================== ФУНКЦИИ ДЛЯ РЕНДЕРИНГА ЗАДАНИЙ ====================
