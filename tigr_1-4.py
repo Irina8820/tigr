@@ -162,6 +162,14 @@ def render_task2(time_list, event_list, key_prefix):
         """,
         unsafe_allow_html=True,
     )
+
+
+# ПЕРЕМЕШИВАЕМ ЗАДАНИЯ 2 В СЛУЧАЙНОМ ПОРЯДКЕ (все 40)
+if "shuffled_task2" not in st.session_state:
+    shuffled_task2 = task_data.person_middle_minus.copy()
+    random.shuffle(shuffled_task2)  # перемешиваем порядок заданий
+    st.session_state.shuffled_task2 = shuffled_task2
+    print(f"Создано задание 2 с {len(st.session_state.shuffled_task2)} примерами")
     
     # СОЗДАЁМ СЛУЧАЙНЫЙ ПОРЯДОК (без random.shuffle)
     # Используем key_prefix как seed для стабильного перемешивания в рамках одного задания
@@ -270,11 +278,17 @@ elif st.session_state.current_step == 5:
 
 # СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ
 elif st.session_state.current_step == 6:
+    # Проверяем, созданы ли данные
+    if "shuffled_task2" not in st.session_state:
+        shuffled_task2 = task_data.person_middle_minus.copy()
+        random.shuffle(shuffled_task2)
+        st.session_state.shuffled_task2 = shuffled_task2
+    
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
-    answ_co = len(task_data.person_middle_minus)
+    answ_co = len(st.session_state.shuffled_task2)  # 40 заданий
     
     if index < answ_co:
-        st.header("Задание 2")
+        st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
         st.markdown(
             """
             <div class="custom-text">
@@ -284,10 +298,10 @@ elif st.session_state.current_step == 6:
             unsafe_allow_html=True,
         )
         
-        task = task_data.person_middle_minus[index]
+        task = st.session_state.shuffled_task2[index]
         matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Далее"):
+        if st.button("Сохранить ответ"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
@@ -301,9 +315,14 @@ elif st.session_state.current_step == 6:
     
     else:
         st.header("Задание 2 завершено!")
+        
+        # СОХРАНЯЕМ РЕЗУЛЬТАТЫ
+        func.save_and_download_result(st, "Задание 2")
+        
         if st.button("Перейти к следующему заданию"):
             st.session_state.current_step = 7
             st.rerun()
+            
 # ==================== ЗАДАНИЕ 3 ====================
 if st.session_state.current_step == 7:
     st.header("Задание 3")
