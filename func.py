@@ -74,9 +74,68 @@ def render_easy_task(st, task, task_index, task_name):
     """
     # Получаем ответы
     answers = task['answers']
+    merged_answers = []
+    used_indices = set()
+
+    for i, ans in enumerate(answers):
+        if i in used_indices:
+            continue
+
+    # Обработка варианта с пометкой (а) - например "заболел(а)"
+        if "(а)" in ans:
+            base_word = ans.replace("(а)", "").strip()
+            if base_word.endswith("л"):
+                masculine = base_word
+                feminine = base_word + "а"
+            elif base_word.endswith("лся"):
+                masculine = base_word
+                feminine = base_word.replace("лся", "лась")
+            else:
+                masculine = base_word
+                feminine = base_word + "а"
+            merged_answers.append(f"{masculine}/{feminine}")
+            used_indices.add(i)
+            continue
+        
+        merged = False
+        for j in range(i + 1, len(answers)):
+            if j in used_indices:
+                continue
+            
+            # мужской (заканчивается на "л") и женский (заканчивается на "ла")
+            if ans.endswith("л") and answers[j].endswith("ла"):
+                merged_answers.append(f"{ans}/{answers[j]}")
+                used_indices.add(i)
+                used_indices.add(j)
+                merged = True
+                break
+            # женский (заканчивается на "ла") и мужской (заканчивается на "л")
+            elif ans.endswith("ла") and answers[j].endswith("л"):
+                merged_answers.append(f"{answers[j]}/{ans}")
+                used_indices.add(i)
+                used_indices.add(j)
+                merged = True
+                break
+            # возвратные глаголы (лся/лась)
+            elif ans.endswith("лся") and answers[j].endswith("лась"):
+                merged_answers.append(f"{ans}/{answers[j]}")
+                used_indices.add(i)
+                used_indices.add(j)
+                merged = True
+                break
+            elif ans.endswith("лась") and answers[j].endswith("лся"):
+                merged_answers.append(f"{answers[j]}/{ans}")
+                used_indices.add(i)
+                used_indices.add(j)
+                merged = True
+                break
+        if not merged:
+            merged_answers.append(ans)
+            used_indices.add(i)
+            
     # Перемешиваем ответы
-    answers_list = list(task['answers'])
-    random.shuffle(answers_list)
+    shuffled_answers = list(merged_answers)
+    random.shuffle(shuffled_answers)
     
     st.write(f"**{task['prime_text']}**")
     st.write(task['stimulus_text'])
@@ -86,7 +145,7 @@ def render_easy_task(st, task, task_index, task_name):
     
     return st.radio(
         "Выберите правильный вариант:",
-        options=answers_list,
+        options=shuffled_answers,
         key=f"{task_name}_{task_index}",
         index=None
     )
