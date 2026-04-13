@@ -17,7 +17,12 @@ def save_results_partial(st, task_name):
 
     if task_responses:
         df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
-        df.to_csv(filename, index=False)
+        df.to_csv(filename, index=False, encoding= 'utf-8-sig')
+        st.success(f"✅ Результаты сохранены в файл: {filename}")
+        return True
+    else:
+        st.info("Нет ответов для сохранения")
+        return False
         
         with open(filename, "rb") as f:
             st.download_button(
