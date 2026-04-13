@@ -16,7 +16,7 @@ def save_results_partial(st, task_name):
     task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)}
 
     if task_responses:
-        df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
+        df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос"], ["Ответ"])
         df.to_csv(filename, index=False, encoding= 'utf-8-sig')
         st.success(f"✅ Результаты сохранены в файл: {filename}")
         return True
