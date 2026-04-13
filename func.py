@@ -156,32 +156,81 @@ def render_middle_minus_task(st, task, task_index, task_name):
     Отображение задания типа person_middle_minus (сопоставление времени и события)
     Формат: {'time': list, 'event': list}
     """
-    st.write("**Соедините действия справа с правильными указаниями времени слева.**")
-
+    
+    # Стилизация
+    st.markdown(
+        """
+        <style>
+            .task2-time, .task2-event {
+                flex: 1;
+                border: 2px solid orange;
+                background-color: #ffebcc;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            .task2-time h4, .task2-event h4 {
+                text-align: center;
+                margin: 0 0 15px 0;
+            }
+            .task2-item {
+                padding: 10px;
+                margin: 10px 0;
+                background-color: white;
+                border-radius: 5px;
+                border-left: 4px solid orange;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    
+    # ПЕРЕМЕШИВАЕМ СОБЫТИЯ В СЛУЧАЙНОМ ПОРЯДКЕ
+    import random
+    indices = list(range(len(task['event'])))
+    random.shuffle(indices)
+    
+    # Два столбца
     col1, col2 = st.columns(2)
-
+    
     with col1:
-        st.write("**Время**")
+        st.markdown('<div class="task2-time"><h4>📅 Время</h4>', unsafe_allow_html=True)
         for i, time_text in enumerate(task['time']):
-            st.write(f"{i + 1}. {time_text}")
-
+            st.markdown(f'<div class="task2-item">{i+1}. {time_text}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     with col2:
-        st.write("**Событие**")
-        for i, event_text in enumerate(task['event']):
-            st.write(f"{chr(65 + i)}. {event_text}")
-
-    st.write("---")
-
+        st.markdown('<div class="task2-event"><h4>📖 Событие</h4>', unsafe_allow_html=True)
+        for display_idx, original_idx in enumerate(indices):
+            letter = chr(65 + display_idx)
+            event_text = task['event'][original_idx]
+            st.markdown(f'<div class="task2-item">{letter}. {event_text}</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown("---")
+    
+    # Выпадающие списки
     matching = {}
     for i, time_text in enumerate(task['time']):
-        matching[i] = st.selectbox(
-            f"Для '{time_text}' выберите событие:",
-            options=list(range(len(task['event']))),
-            format_func=lambda x, event_list=task['event']: f"{chr(65 + x)}. {event_list[x]}",
+        options = []
+        for display_idx, original_idx in enumerate(indices):
+            letter = chr(65 + display_idx)
+            event_text = task['event'][original_idx]
+            options.append(f"{letter}. {event_text}")
+        
+        selected = st.selectbox(
+            f"«{time_text}»:",
+            options=options,
             key=f"{task_name}_{task_index}_match_{i}",
             index=None
         )
-
+        
+        if selected:
+            selected_letter = selected[0]
+            selected_display_idx = ord(selected_letter) - 65
+            matching[i] = indices[selected_display_idx]
+        else:
+            matching[i] = None
+    
     return matching
 
 
