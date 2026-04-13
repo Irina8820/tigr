@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import random
+from datetime import datetime
+import io
 
 def skip_task(st, curr_index=int, max_index=int, task_name=str):
     st.markdown(
@@ -35,9 +37,6 @@ def skip_task(st, curr_index=int, max_index=int, task_name=str):
 
 def save_and_download_result(st, task_name):
     """Сохраняет результаты и сразу предлагает скачать файл"""
-    from datetime import datetime
-    import pandas as pd
-    
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"results_{task_name}_{timestamp}.csv"
     
@@ -45,17 +44,23 @@ def save_and_download_result(st, task_name):
     task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)}
     
     if task_responses:
-        df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
-        df.to_csv(filename, index=False, encoding='utf-8-sig')
+        data = []
+        for question, answer in task_responses.items():
+            data.append({"Вопрос": question, "Ответ": answer})
+        
+        df = pd.DataFrame(data)
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False, encoding='utf-8-sig')
+        csv_string = csv_buffer.getvalue()
+        
         
         # Показываем кнопку для скачивания
-        with open(filename, "rb") as f:
-            st.download_button(
-                label=f"📥 Скачать результаты задания {task_name}",
-                data=f,
-                file_name=filename,
-                mime="text/csv"
-            )
+        st.download_button(
+            label=f"📥 Скачать результаты задания {task_name}",
+            data=csv_string.encode('utf-8-sig'),
+            file_name=filename,
+            mime="text/csv"
+        )
         st.success(f"✅ Результаты задания {task_name} готовы к скачиванию!")
         return True
     else:
