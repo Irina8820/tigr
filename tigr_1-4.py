@@ -13,7 +13,7 @@ def save_results_partial(st, task_name):
     filename = f"results_{task_name}_{timestamp}.csv"
     
     # Собираем ответы только по текущему заданию
-    task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)
+    task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)}
 
     if task_responses:
         df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
