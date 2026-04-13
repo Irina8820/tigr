@@ -4,6 +4,31 @@ import streamlit as st
 import task_data
 import func
 import random
+import pandas as pd
+from datetime import datetime
+
+def save_results_partial(st, task_name):
+    """Сохраняет результаты после завершения задания"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results_{task_name}_{timestamp}.csv"
+    
+    # Собираем ответы только по текущему заданию
+    task_responses = {k: v for k, v in st.session_state.responses.items() if k.startswith(task_name)
+
+    if task_responses:
+        df = pd.DataFrame(list(task_responses.items()), columns=["Вопрос", "Ответ"])
+        df.to_csv(filename, index=False)
+        
+        with open(filename, "rb") as f:
+            st.download_button(
+                label=f"📥 Скачать результаты задания {task_name}",
+                data=f,
+                file_name=filename,
+                mime="text/csv",
+                key=f"download_{task_name}"
+            )
+        return True
+    return False
 
 # Перемешиваем и берём 50 случайных примеров только для основного задания 1
 if "shuffled_task1" not in st.session_state:
@@ -67,6 +92,11 @@ elif st.session_state.current_step == 2:
 
 elif st.session_state.current_step == 3:
     # ОСНОВНОЕ ЗАДАНИЕ - ИСПОЛЬЗУЕМ 50 СЛУЧАЙНЫХ ПРИМЕРОВ
+    if "shuffled_task1" not in st.session_state:
+        shuffled_task1 = task_data.person_easy.copy()
+        random.shuffle(shuffled_task1)
+        st.session_state.shuffled_task1 = shuffled_task1[:50]
+
     index = len(st.session_state.responses)
     answ_co = len(st.session_state.shuffled_task1)  # 50 случайных примеров
 
@@ -80,6 +110,19 @@ elif st.session_state.current_step == 3:
         func.skip_task(st, index, answ_co, "Задание 1: ")
     else:
         st.header("Задание 1 завершено!")
+
+        st.write("---")
+        st.subheader("💾 Сохранение результатов")
+        
+        saved = save_results_partial(st, "Задание 1")
+        
+        if saved:
+            st.success("Результаты задания 1 сохранены! Скачайте файл выше.")
+        else:
+            st.info("Нет ответов для сохранения.")
+        
+        st.write("---")
+        
         if st.button("Перейти к следующему заданию"):
             st.session_state.current_step = 4
             st.rerun()
