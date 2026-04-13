@@ -127,7 +127,7 @@ def render_task2(time_list, event_list, key_prefix):
     """Отображает задание на сопоставление со случайным порядком событий"""
 # В основном задании 2
 task = st.session_state.shuffled_task2[index]
-matching = func.render_middle_minus_task(st, task, index, "task2")
+matching = func.render_task2(task["time"], task["event"], f"task2_{index}")
 
     # Стилизация
 st.markdown(
