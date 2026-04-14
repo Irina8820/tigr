@@ -42,6 +42,12 @@ if "shuffled_task1" not in st.session_state:
     st.session_state.shuffled_task1 = shuffled_task1[:50]
     print(f"Создано задание 1 с {len(st.session_state.shuffled_task1)} примерами")  # отладка
 
+if "shuffled_task3" not in st.session_state:
+    shuffled_task3 = task_data.person_middle_plus.copy()
+    random.shuffle(shuffled_task3)
+    st.session_state.shuffled_task3 = shuffled_task3[:50]
+    print(f"Задание 3: {len(st.session_state.shuffled_task3)} примеров")
+
 # Инициализация состояния страницы
 if "current_step" not in st.session_state:
     st.session_state.current_step = 0
