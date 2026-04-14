@@ -67,6 +67,37 @@ def save_and_download_result(st, task_name):
         st.info("Нет ответов для сохранения")
         return False
 
+def save_all_results(st):
+    """Сохраняет результаты всех заданий в один CSV файл"""
+    from datetime import datetime
+    import pandas as pd
+    import io
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"results_all_tasks_{timestamp}.csv"
+    
+    if st.session_state.responses:
+        data = []
+        for question, answer in st.session_state.responses.items():
+            data.append({"Вопрос": question, "Ответ": answer})
+        
+        df = pd.DataFrame(data)
+        csv_buffer = io.StringIO()
+        df.to_csv(csv_buffer, index=False, encoding='utf-8-sig')
+        csv_string = csv_buffer.getvalue()
+        
+        st.download_button(
+            label="📥 Скачать результаты ВСЕХ заданий",
+            data=csv_string.encode('utf-8-sig'),
+            file_name=filename,
+            mime="text/csv"
+        )
+        st.success("✅ Результаты всех заданий готовы к скачиванию!")
+        return True
+    else:
+        st.info("Нет ответов для сохранения")
+        return False
+
 
 # ==================== ФУНКЦИИ ДЛЯ РЕНДЕРИНГА ЗАДАНИЙ ====================
 
