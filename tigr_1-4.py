@@ -450,12 +450,16 @@ elif st.session_state.current_step == 8:
 elif st.session_state.current_step == 9:
     
     if "shuffled_task3" not in st.session_state:
+        
         shuffled_task3 = task_data.person_middle_plus.copy()
         random.shuffle(shuffled_task3)
         st.session_state.shuffled_task3 = shuffled_task3[:50]
         
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 3")])
-    answ_co = len(task_data.person_middle_plus)
+    answ_co = len(st.session_state.shuffled_task3)
+
+    # ОТЛАДКА: выводим в консоль количество
+    print(f"Задание 3: index={index}, answ_co={answ_co}")
 
     if index < answ_co:
         st.header(f"Задание 3 (вопрос {index + 1} из {answ_co})")
