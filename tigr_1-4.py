@@ -442,13 +442,19 @@ elif st.session_state.current_step == 8:
             st.rerun()
 
 elif st.session_state.current_step == 9:
+    
+    if "shuffled_task3" not in st.session_state:
+        shuffled_task3 = task_data.person_middle_plus.copy()
+        random.shuffle(shuffled_task3)
+        st.session_state.shuffled_task3 = shuffled_task3[:50]
+        
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 3")])
     answ_co = len(task_data.person_middle_plus)
 
     if index < answ_co:
-        st.header("Задание 3")
+        st.header(f"Задание 3 (вопрос {index + 1} из {answ_co})")
         
-        task = task_data.person_middle_plus[index]
+        task = st.session_state.shuffled_task3[index]
         stimulus = task["stimulus_text"]
         answers = task["answers"]
         
@@ -546,6 +552,10 @@ elif st.session_state.current_step == 9:
     
     else:
         st.header("Задание 3 завершено!")
+        
+
+        func.save_and_download_result(st, "Задание 3")
+        
         if st.button("Перейти к следующему заданию"):
             st.session_state.current_step = 10
             st.rerun()
