@@ -48,6 +48,12 @@ if "shuffled_task3" not in st.session_state:
     st.session_state.shuffled_task3 = shuffled_task3[:50]
     print(f"Задание 3: {len(st.session_state.shuffled_task3)} примеров")
 
+if "shuffled_task4" not in st.session_state:
+    shuffled_task4 = task_data.person_complex.copy()
+    random.shuffle(shuffled_task4)
+    st.session_state.shuffled_task4 = shuffled_task4[:50]
+    print(f"Задание 4: {len(st.session_state.shuffled_task4)} примеров")
+
 # Инициализация состояния страницы
 if "current_step" not in st.session_state:
     st.session_state.current_step = 0
@@ -606,18 +612,33 @@ elif st.session_state.current_step == 11:
             st.rerun()
 
 elif st.session_state.current_step == 12:
+
+    if "shuffled_task4" not in st.session_state:
+        shuffled_task4 = task_data.person_complex.copy()
+        random.shuffle(shuffled_task4)
+        st.session_state.shuffled_task4 = shuffled_task4[:50]
+        
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 4")])
-    answ_co = len(task_data.person_complex)
+    answ_co = len(st.session_state.shuffled_task4)
 
     if index < answ_co:
-        st.header("Задание 4")
-        answer = func.render_complex_task(st, task_data.person_complex[index], index, "Задание4")
+        st.header(f"Задание 4 (вопрос {index + 1} из {answ_co})")
+        answer = func.render_complex_task(st, st.session_state.shuffled_task4[index], index, "Задание4")
 
-        if st.button("Далее") and answer:
-            st.session_state.responses[f"Задание 4: {task_data.person_complex[index]}"] = answer
+        if st.button("Сохранить ответ") and answer:
+            st.session_state.responses[f"Задание 4 (вопрос {index + 1}): {st.session_state.shuffled_task4[index]}"] = answer
             st.rerun()
 
         func.skip_task(st, index, answ_co, "Задание 4: ")
     else:
         st.header("Задание 4 завершено!")
-        func.save_result(st)
+
+
+        st.markdown("---")
+        st.subheader("💾 Сохранение всех результатов")
+
+        
+        func.save_all_results(st)
+
+        st.success("🎉 Поздравляем! Вы выполнили все задания!")
+        st.balloons()
