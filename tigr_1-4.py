@@ -35,23 +35,23 @@ def save_results_partial(st, task_name):
         return True
     return False
 
-# Перемешиваем и берём 50 случайных примеров только для основного задания 1
+# Перемешиваем и берём 40 случайных примеров только для основного задания 1
 if "shuffled_task1" not in st.session_state:
     shuffled_task1 = task_data.person_easy.copy()
     random.shuffle(shuffled_task1)
-    st.session_state.shuffled_task1 = shuffled_task1[:50]
+    st.session_state.shuffled_task1 = shuffled_task1[:40]
     print(f"Создано задание 1 с {len(st.session_state.shuffled_task1)} примерами")  # отладка
 
 if "shuffled_task3" not in st.session_state:
     shuffled_task3 = task_data.person_middle_plus.copy()
     random.shuffle(shuffled_task3)
-    st.session_state.shuffled_task3 = shuffled_task3[:50]
+    st.session_state.shuffled_task3 = shuffled_task3[:40]
     print(f"Задание 3: {len(st.session_state.shuffled_task3)} примеров")
 
 if "shuffled_task4" not in st.session_state:
     shuffled_task4 = task_data.person_complex.copy()
     random.shuffle(shuffled_task4)
-    st.session_state.shuffled_task4 = shuffled_task4[:50]
+    st.session_state.shuffled_task4 = shuffled_task4[:40]
     print(f"Задание 4: {len(st.session_state.shuffled_task4)} примеров")
 
 # Инициализация состояния страницы
@@ -115,7 +115,7 @@ elif st.session_state.current_step == 3:
         st.session_state.shuffled_task1 = shuffled_task1[:50]
 
     index = len(st.session_state.responses)
-    answ_co = len(st.session_state.shuffled_task1)  # 50 случайных примеров
+    answ_co = len(st.session_state.shuffled_task1)  # 40 случайных примеров
 
     if index < answ_co:
         st.header(f"Задание 1 (вопрос {index + 1} из {answ_co})")
@@ -459,7 +459,7 @@ elif st.session_state.current_step == 9:
         
         shuffled_task3 = task_data.person_middle_plus.copy()
         random.shuffle(shuffled_task3)
-        st.session_state.shuffled_task3 = shuffled_task3[:50]
+        st.session_state.shuffled_task3 = shuffled_task3[:40]
         
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 3")])
     answ_co = len(st.session_state.shuffled_task3)
