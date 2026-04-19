@@ -334,7 +334,7 @@ if st.session_state.current_step == 7:
     st.header("Задание 3")
     st.markdown(
         """
-        <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
+        <style>.custom-text {font-size: 30px; line-height: 1.6; margin-bottom: 32px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным словом.</p>
             <p>Ниже будут представлены 3 варианта ответов</p>
@@ -581,7 +581,7 @@ if st.session_state.current_step == 10:
     st.header("Задание 4")
     st.markdown(
         """
-        <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
+        <style>.custom-text {font-size: 30px; line-height: 1.6; margin-bottom: 32px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным словом.</p>
             <p>Рядом с пропуском будет написано слово (в скобках)</p>
