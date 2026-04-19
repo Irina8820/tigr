@@ -76,7 +76,7 @@ if st.session_state.current_step == 1:
     st.header("Задание 1")
     st.markdown(
         """
-        <style>.custom-text {font-size: 18px; line-height: 1.6; margin-bottom: 20px;}</style>
+        <style>.custom-text {font-size: 30px; line-height: 1.6; margin-bottom: 32px;}</style>
         <div class="custom-text">
             <p>Вы увидите предложение с пропущенным глаголом.</p>
             <p>Над этим предложением вы увидите предложение-образец, опираясь на которое вам нужно будет заполнить пропуск.</p>
@@ -167,9 +167,9 @@ def render_task2(time_list, event_list, key_prefix):
                 border-left: 4px solid orange;
             }
             .custom-text {
-                font-size: 18px;
+                font-size: 30px;
                 line-height: 1.6;
-                margin-bottom: 20px;
+                margin-bottom: 32px;
             }
         </style>
         """,
