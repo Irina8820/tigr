@@ -216,11 +216,18 @@ def render_task2(time_list, event_list, key_prefix):
                 background-color: white;
                 border-radius: 5px;
                 border-left: 4px solid orange;
+                font-size: 20px
+                font-weight: 500;
             }
             .custom-text {
-                font-size: 20px;
+                font-size: 30px;
                 line-height: 1.6;
                 margin-bottom: 20px;
+            }
+            .stSelectbox label {
+                font-size: 18px
+            }
+            .stSelectbox div[data-baseweb="select"] {
             }
         </style>
         """,
