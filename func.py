@@ -216,7 +216,7 @@ def render_task2(time_list, event_list, key_prefix):
                 background-color: white;
                 border-radius: 5px;
                 border-left: 4px solid orange;
-                font-size: 20px
+                font-size: 30px
                 font-weight: 500;
             }
             .custom-text {
@@ -225,7 +225,7 @@ def render_task2(time_list, event_list, key_prefix):
                 margin-bottom: 20px;
             }
             .stSelectbox label {
-                font-size: 18px
+                font-size: 25px
             }
             .stSelectbox div[data-baseweb="select"] {
             }
