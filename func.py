@@ -15,7 +15,7 @@ def skip_task(st, curr_index=int, max_index=int, task_name=str):
                 border-radius: 5px;
                 color: red;
                 cursor: pointer;
-                font-size: 14px;
+                font-size: 20px;
                 position: fixed;
                 bottom: 20px;
                 right: 20px;
