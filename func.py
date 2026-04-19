@@ -218,7 +218,7 @@ def render_task2(time_list, event_list, key_prefix):
                 border-left: 4px solid orange;
             }
             .custom-text {
-                font-size: 18px;
+                font-size: 20px;
                 line-height: 1.6;
                 margin-bottom: 20px;
             }
