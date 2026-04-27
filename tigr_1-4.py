@@ -40,7 +40,13 @@ if "shuffled_task1" not in st.session_state:
     shuffled_task1 = task_data.person_easy.copy()
     random.shuffle(shuffled_task1)
     st.session_state.shuffled_task1 = shuffled_task1[:40]
-    print(f"Создано задание 1 с {len(st.session_state.shuffled_task1)} примерами")  # отладка
+    print(f"Создано задание 1 с {len(st.session_state.shuffled_task1)} примерами") # отладка
+
+if "shuffled_task2" not in st.session_state:
+    shuffled_task2 = task_data.person_middle_minus.copy()
+    random.shuffle(shuffled_task2)
+    st.session_state.shuffled_task2 = shuffled_task2[:12]  # берём 12 случайных
+    print(f"Задание 2: {len(st.session_state.shuffled_task2)} примеров")
 
 if "shuffled_task3" not in st.session_state:
     shuffled_task3 = task_data.person_middle_plus.copy()
@@ -289,9 +295,15 @@ elif st.session_state.current_step == 5:
 
 
 # СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ
-elif st.session_state.current_step == 6:    
+elif st.session_state.current_step == 6:
+
+    if "shuffled_task2" not in st.session_state:
+        shuffled_task2 = task_data.person_middle_minus.copy()
+        random.shuffle(shuffled_task2)
+        st.session_state.shuffled_task2 = shuffled_task2[:12]
+    
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
-    answ_co = len(st.session_state.shuffled_task2)  # 40 заданий
+    answ_co = len(st.session_state.shuffled_task2)  # 12 заданий
     
     if index < answ_co:
         st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
