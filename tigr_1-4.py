@@ -45,7 +45,7 @@ if "shuffled_task1" not in st.session_state:
 if "shuffled_task2" not in st.session_state:
     shuffled_task2 = task_data.person_middle_minus.copy()
     random.shuffle(shuffled_task2)
-    st.session_state.shuffled_task2 = shuffled_task2[:12]  # берём 12 случайных
+    st.session_state.shuffled_task2 = shuffled_task2[:36]  # берём 36 случайных строк, то есть в итоге 12 комплектов заданий
     print(f"Задание 2: {len(st.session_state.shuffled_task2)} примеров")
 
 if "shuffled_task3" not in st.session_state:
