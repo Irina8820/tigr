@@ -302,10 +302,16 @@ elif st.session_state.current_step == 6:
         random.shuffle(shuffled_task2)
         st.session_state.shuffled_task2 = shuffled_task2[:12]
         
-    task2_answers = [k for k in st.session_state.responses.keys() if k.startswith("Задание 2:")]
-    # В каждом блоке 3 ответа, поэтому номер блока = количество ответов // 3
-    current_block = len(task2_answers) // 3
+     task2_answers = []
+    for key in st.session_state.responses.keys():
+        if key.startswith("Задание 2:") and st.session_state.responses[key] != "[ПРОПУЩЕНО]":
+            task2_answers.append(key)
+    
+   current_block = len(task2_answers) // 3
     total_blocks = len(st.session_state.shuffled_task2)
+
+# ОТЛАДКА (можно убрать после проверки)
+    st.write(f"DEBUG: Всего ответов={len(task2_answers)}, текущий блок={current_block}, всего блоков={total_blocks}")
     
     if current_block < total_blocks:
         st.header(f"Задание 2 (блок {current_block + 1} из {total_blocks})")
