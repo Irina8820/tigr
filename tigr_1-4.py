@@ -319,7 +319,7 @@ elif st.session_state.current_step == 6:
         task = st.session_state.shuffled_task2[index]
         matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Сохранить ответ"):
+        if st.button("Сохранить ответ", key=f"save_task2_{index}"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
