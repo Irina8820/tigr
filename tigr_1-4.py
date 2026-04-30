@@ -296,9 +296,14 @@ elif st.session_state.current_step == 5:
 
 # СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ
 elif st.session_state.current_step == 6:
-    
-    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
-    answ_co = len(st.session_state.shuffled_task2)  # 12 заданий
+    if "shuffled_task2" not in st.session_state:
+        shuffled_task2 = task_data.person_middle_minus.copy()
+        random.shuffle(shuffled_task2)
+        st.session_state.shuffled_task2 = shuffled_task2[:12]
+        
+    completed_blocks = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2 (блок")]) // 3
+    index = completed_blocks
+    answ_co = len(st.session_state.shuffled_task2)
     
     if index < answ_co:
         st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
