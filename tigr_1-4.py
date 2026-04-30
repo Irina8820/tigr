@@ -302,12 +302,13 @@ elif st.session_state.current_step == 6:
         random.shuffle(shuffled_task2)
         st.session_state.shuffled_task2 = shuffled_task2[:12]
         
-    total_answers = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
-    index = total_answers // 3  # 3 ответа на блок
-    answ_co = len(st.session_state.shuffled_task2)
+    task2_answers = [k for k in st.session_state.responses.keys() if k.startswith("Задание 2:")]
+    # В каждом блоке 3 ответа, поэтому номер блока = количество ответов // 3
+    current_block = len(task2_answers) // 3
+    total_blocks = len(st.session_state.shuffled_task2)
     
-    if index < answ_co:
-        st.header(f"Задание 2 (вопрос {index + 1} из {answ_co})")
+    if current_block < total_blocks:
+        st.header(f"Задание 2 (блок {current_block + 1} из {total_blocks})")
         st.markdown(
             """
             <div class="custom-text">
@@ -317,10 +318,10 @@ elif st.session_state.current_step == 6:
             unsafe_allow_html=True,
         )
         
-        task = st.session_state.shuffled_task2[index]
-        matching = render_task2(task["time"], task["event"], f"task2_{index}")
+        task = st.session_state.shuffled_task2[current_block]
+        matching = render_task2(task["time"], task["event"], f"task2_{current_block}")
         
-        if st.button("Сохранить ответ"):
+        if st.button("Сохранить ответ", key=f"save_block_{current_block}"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
