@@ -302,9 +302,8 @@ elif st.session_state.current_step == 6:
         random.shuffle(shuffled_task2)
         st.session_state.shuffled_task2 = shuffled_task2[:12]
         st.session_state.task2_block = 0
-        
-     current_block = st.session_state.task2_block
-     total_blocks = len(st.session_state.shuffled_task2)
+    
+    current_block = st.session_state.task2_blocktotal_blocks = len(st.session_state.shuffled_task2)
     
     if current_block < total_blocks:
         st.header(f"Задание 2 (блок {current_block + 1} из {total_blocks})")
