@@ -301,17 +301,10 @@ elif st.session_state.current_step == 6:
         shuffled_task2 = task_data.person_middle_minus.copy()
         random.shuffle(shuffled_task2)
         st.session_state.shuffled_task2 = shuffled_task2[:12]
+        st.session_state.task2_block = 0
         
-     task2_answers = []
-    for key in st.session_state.responses.keys():
-        if key.startswith("Задание 2:") and st.session_state.responses[key] != "[ПРОПУЩЕНО]":
-            task2_answers.append(key)
-    
-   current_block = len(task2_answers) // 3
-    total_blocks = len(st.session_state.shuffled_task2)
-
-# ОТЛАДКА (можно убрать после проверки)
-    st.write(f"DEBUG: Всего ответов={len(task2_answers)}, текущий блок={current_block}, всего блоков={total_blocks}")
+     current_block = st.session_state.task2_block
+     total_blocks = len(st.session_state.shuffled_task2)
     
     if current_block < total_blocks:
         st.header(f"Задание 2 (блок {current_block + 1} из {total_blocks})")
@@ -332,6 +325,7 @@ elif st.session_state.current_step == 6:
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
                     st.session_state.responses[f"Задание 2: {time_text}"] = selected_event_text
+                st.session_state.task2_block += 1
                 st.rerun()
             else:
                 st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
@@ -342,12 +336,11 @@ elif st.session_state.current_step == 6:
             task = st.session_state.shuffled_task2[current_block]
             for i, time_text in enumerate(task["time"]):
                 st.session_state.responses[f"Задание 2: {time_text}"] = "[ПРОПУЩЕНО]"
+            st.session_state.task2_block += 1
             st.rerun()
     
     else:
         st.header("Задание 2 завершено!")
-        
-        # СОХРАНЯЕМ РЕЗУЛЬТАТЫ
         func.save_and_download_result(st, "Задание 2")
         
         if st.button("Перейти к следующему заданию"):
