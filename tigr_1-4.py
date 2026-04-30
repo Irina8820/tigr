@@ -331,7 +331,7 @@ elif st.session_state.current_step == 6:
                 st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
         
         # Кнопка пропуска
-        func.skip_task(st, index, answ_co, "Задание 2: ")
+        func.skip_task(st, current_block, answ_co, "Задание 2: ")
     
     else:
         st.header("Задание 2 завершено!")
