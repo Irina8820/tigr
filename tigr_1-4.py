@@ -331,7 +331,12 @@ elif st.session_state.current_step == 6:
                 st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
         
         # Кнопка пропуска
-        func.skip_task(st, current_block, answ_co, "Задание 2: ")
+        if st.button("Пропустить задание", key=f"skip_block_{current_block}"):
+            # Пропускаем текущий блок: добавляем 3 пустых ответа
+            task = st.session_state.shuffled_task2[current_block]
+            for i, time_text in enumerate(task["time"]):
+                st.session_state.responses[f"Задание 2: {time_text}"] = "[ПРОПУЩЕНО]"
+            st.rerun()
     
     else:
         st.header("Задание 2 завершено!")
