@@ -45,8 +45,8 @@ if "shuffled_task1" not in st.session_state:
 if "shuffled_task2" not in st.session_state:
     shuffled_task2 = task_data.person_middle_minus.copy()
     random.shuffle(shuffled_task2)
-    st.session_state.shuffled_task2 = shuffled_task2[:36]  # берём 36 случайных строк, то есть в итоге 12 комплектов заданий
-    print(f"Задание 2: {len(st.session_state.shuffled_task2)} примеров")
+    st.session_state.shuffled_task2 = shuffled_task2[:12]  # берём 36 случайных строк, то есть в итоге 12 комплектов заданий
+    print(f"Задание 2: {len(st.session_state.shuffled_task2)} блоков")
 
 if "shuffled_task3" not in st.session_state:
     shuffled_task3 = task_data.person_middle_plus.copy()
@@ -296,11 +296,6 @@ elif st.session_state.current_step == 5:
 
 # СТРАНИЦА 6: ОСНОВНОЕ ЗАДАНИЕ
 elif st.session_state.current_step == 6:
-
-    if "shuffled_task2" not in st.session_state:
-        shuffled_task2 = task_data.person_middle_minus.copy()
-        random.shuffle(shuffled_task2)
-        st.session_state.shuffled_task2 = shuffled_task2[:12]
     
     index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
     answ_co = len(st.session_state.shuffled_task2)  # 12 заданий
