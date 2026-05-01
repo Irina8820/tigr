@@ -300,13 +300,13 @@ elif st.session_state.current_step == 6:
     if "shuffled_task2" not in st.session_state:
         shuffled_task2 = task_data.person_middle_minus.copy()
         random.shuffle(shuffled_task2)
-        st.session_state.shuffled_task2 = shuffled_task2[:12]
-        st.session_state.task2_block = 0
+        st.session_state.shuffled_task2 = shuffled_task2
     
-    current_block = st.session_state.task2_blocktotal_blocks = len(st.session_state.shuffled_task2)
+    index = len([k for k in st.session_state.responses.keys() if k.startswith("Задание 2")])
+    answ_co = len(st.session_state.shuffled_task2)
     
-    if current_block < total_blocks:
-        st.header(f"Задание 2 (блок {current_block + 1} из {total_blocks})")
+    if index < answ_co:
+        st.header(f"Задание 2 (блок {index + 1} из {answ_co})")
         st.markdown(
             """
             <div class="custom-text">
@@ -316,30 +316,25 @@ elif st.session_state.current_step == 6:
             unsafe_allow_html=True,
         )
         
-        task = st.session_state.shuffled_task2[current_block]
-        matching = render_task2(task["time"], task["event"], f"task2_{current_block}")
+        task = st.session_state.shuffled_task2[index]
+        matching = render_task2(task["time"], task["event"], f"task2_{index}")
         
-        if st.button("Сохранить ответ", key=f"save_block_{current_block}"):
+        if st.button("Сохранить ответ"):
             if all(v is not None for v in matching.values()):
                 for i, time_text in enumerate(task["time"]):
                     selected_event_text = task["event"][matching[i]]
-                    st.session_state.responses[f"Задание 2: {time_text}"] = selected_event_text
-                st.session_state.task2_block += 1
+                    st.session_state.responses[f"Задание 2: (вопрос {index + 1}): {time_text}"] = selected_event_text
                 st.rerun()
             else:
                 st.warning("Пожалуйста, выберите событие для каждого указателя времени.")
         
         # Кнопка пропуска
-        if st.button("Пропустить задание", key=f"skip_block_{current_block}"):
-            # Пропускаем текущий блок: добавляем 3 пустых ответа
-            task = st.session_state.shuffled_task2[current_block]
-            for i, time_text in enumerate(task["time"]):
-                st.session_state.responses[f"Задание 2: {time_text}"] = "[ПРОПУЩЕНО]"
-            st.session_state.task2_block += 1
-            st.rerun()
+        func.skip_task(st, index, answ_co, "Задание 2: ")
     
     else:
         st.header("Задание 2 завершено!")
+
+        
         func.save_and_download_result(st, "Задание 2")
         
         if st.button("Перейти к следующему заданию"):
