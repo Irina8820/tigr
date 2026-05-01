@@ -306,7 +306,7 @@ elif st.session_state.current_step == 6:
     answ_co = len(st.session_state.shuffled_task2)
     
     if index < answ_co:
-        st.header(f"Задание 2 (блок {index + 1} из {answ_co})")
+        st.header(f"Задание 2 (предложений {index + 1} из {answ_co})")
         st.markdown(
             """
             <div class="custom-text">
